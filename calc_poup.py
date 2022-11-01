@@ -1,5 +1,6 @@
 import locale
 from tkinter import *
+from ScrapyBcb.BcPoup.spiders import Bcb
 
 
 def valor_total():
@@ -21,17 +22,37 @@ def valor_total():
     label_total['text'] = total
 
 
+def buscar_rend():
+    label_valor_rend['text'] = ''
+    label_total['text'] = ''
+    lista = open('D:/pys/pycharm/calcpoup/ScrapyBcb/BcPoup/spiders/rendimento.txt', 'r')
+    l_rend = []
+    for i in lista:
+        l_rend.append(i[:-1])
+    lista.close()
+    data_rend = entry_data.get()
+    for i in range(len(l_rend)):
+        if l_rend[i] == data_rend:
+            rendimento.set(l_rend[i+1])
+            label_estado['text'] = "Data localizada!"
+            valor_total()
+            break
+        if i == len(l_rend)-1:
+            label_estado['text'] = "Data não localizada!"
+
+
 locale.setlocale(locale.LC_ALL, '')
 
+# Inicializa o scrapy do rendimentos com fonte o Banco central do Brasil
+Bcb
+
 screen = Tk()
-# screen.geometry('550x200')
 padvar = 3
 fontsize = 15
 screen.title('Cálculo de poupança')
 
 label_valor = Label(screen, text='Valor a calcular', padx=padvar, pady=padvar, justify='left', font=fontsize)
 label_valor.grid(column=0, row=0, sticky=(W))
-
 
 valor = DoubleVar()
 valor.set('0000,00')
@@ -40,8 +61,6 @@ entry_valor.grid(column=1, row=0)
 
 label_rendimento = Label(screen, text='Valor do rendimento', padx=padvar, pady=padvar, font=fontsize)
 label_rendimento.grid(column=0, row=1, sticky=(W))
-
-
 
 rendimento = DoubleVar()
 rendimento.set('0,0000')
@@ -59,8 +78,11 @@ entry_data.grid(column=1, row=2)
 button_calcular = Button(screen, text='Calcular valor reajustado', command=valor_total, padx=padvar, pady=padvar, font=fontsize)
 button_calcular.grid(column=2, row=1, sticky=(W))
 
-button_calcular = Button(screen, text='Calcular valor pela data', command=valor_total, padx=padvar, pady=padvar, font=fontsize)
-button_calcular.grid(column=2, row=2, sticky=(W, E))
+button_data = Button(screen, text='Calcular valor pela data', command=buscar_rend, padx=padvar, pady=padvar, font=fontsize)
+button_data.grid(column=2, row=2, sticky=(W, E))
+
+label_estado = Label(screen, text='', padx=padvar, pady=padvar, relief='sunken', font=fontsize)
+label_estado.grid(column=2, rowspan=4, sticky=(N, S, W, E))
 
 title_valor_rend = Label(screen, text='Rendimento', padx=padvar, pady=padvar, font=fontsize)
 title_valor_rend.grid(column=0, row=4, sticky=(E))
@@ -71,9 +93,7 @@ label_valor_rend.grid(column=1, row=4, sticky=(W, E))
 title_total = Label(screen, text='Valor total', font=fontsize)
 title_total.grid(column=0, row=5, sticky=(E))
 
-
 label_total = Label(screen, text='', padx=padvar, pady=padvar, relief='sunken', font=fontsize)
 label_total.grid(column=1, row=5, sticky=(W, E))
-
 
 screen.mainloop()
